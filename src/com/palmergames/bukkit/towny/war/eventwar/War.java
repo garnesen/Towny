@@ -361,6 +361,11 @@ public class War {
 
 	private void launchFireworkAtPlot(final TownBlock townblock, final Player atPlayer, final FireworkEffect.Type type, final Color c)
 	{
+		// Check the config. If this is false, do not launch a firework.
+		if (!TownySettings.getPlotsFireworkOnAttacked()) {
+			return;
+		}
+		
 		BukkitTools.scheduleSyncDelayedTask(new Runnable() { 
 
 			public void run() {
