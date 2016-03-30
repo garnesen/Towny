@@ -1185,11 +1185,6 @@ public class TownySettings {
 		return getBoolean(ConfigNodes.WAR_EVENT_TOWNS_NEUTRAL);
 	}
 
-	public static boolean isAllowWarBlockGriefing() {
-
-		return getBoolean(ConfigNodes.WAR_EVENT_BLOCK_GRIEFING);
-	}
-
 	public static int getWarzoneTownBlockHealth() {
 
 		return getInt(ConfigNodes.WAR_EVENT_TOWN_BLOCK_HP);

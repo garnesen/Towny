@@ -278,14 +278,7 @@ public class PlayerCacheUtil {
 		try {
 			// War Time switch rights
 			if (TownyUniverse.isWarTime()) {
-				if (TownySettings.isAllowWarBlockGriefing()) {
-					try {
-						if (!resident.getTown().getNation().isNeutral() && !town.getNation().isNeutral())
-							return TownBlockStatus.WARZONE;
-					} catch (NotRegisteredException e) {
-
-					}
-				}
+				
 				//If this town is not in a nation and we are set to non peaceful status during war.
 				if (!TownySettings.isWarTimeTownsNeutral() && !town.hasNation())
 					return TownBlockStatus.WARZONE;

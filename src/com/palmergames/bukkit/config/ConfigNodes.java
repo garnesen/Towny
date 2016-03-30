@@ -1164,10 +1164,6 @@ public enum ConfigNodes {
 			"false",
 			"",
 			"# If true and the monarch/king dies the nation is removed from the war."),
-	WAR_EVENT_BLOCK_GRIEFING(
-			"war.event.allow_block_griefing",
-			"true",
-			"# If enabled players will be able to break/place blocks in enemy plots during a war."),
 
 	WAR_EVENT_BLOCK_HP_HEADER(
 			"war.event.block_hp",

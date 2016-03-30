@@ -334,7 +334,7 @@ public class TownyBlockListener implements Listener {
 				}
 
 				TownBlock townBlock = townyWorld.getTownBlock(coord);
-				if ((block.getRelative(BlockFace.DOWN).getType() != Material.OBSIDIAN) && ((!townBlock.getTown().isFire() && !townyWorld.isForceFire() && !townBlock.getPermissions().fire) || (TownyUniverse.isWarTime() && TownySettings.isAllowWarBlockGriefing() && !townBlock.getTown().hasNation()))) {
+				if ((block.getRelative(BlockFace.DOWN).getType() != Material.OBSIDIAN) && (!townBlock.getTown().isFire() && !townyWorld.isForceFire() && !townBlock.getPermissions().fire)) {
 					TownyMessaging.sendDebugMsg("onBlockIgnite: Canceled " + block.getType().name() + " from igniting within " + coord.toString() + ".");
 					return true;
 				}
@@ -415,10 +415,8 @@ public class TownyBlockListener implements Listener {
 
 		try {
 			TownBlock townBlock = world.getTownBlock(coord);
-			if (world.isUsingTowny() && !world.isForceExpl()) {
-				if ((!townBlock.getPermissions().explosion) || (TownyUniverse.isWarTime() && TownySettings.isAllowWarBlockGriefing() && !townBlock.getTown().hasNation() && !townBlock.getTown().isBANG())) {
+			if (world.isUsingTowny() && !world.isForceExpl() && !townBlock.getPermissions().explosion) {
 					return false;
-				}
 			}
 		} catch (NotRegisteredException e) {
 			return world.isExpl();
