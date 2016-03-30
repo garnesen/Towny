@@ -1201,6 +1201,37 @@ public enum ConfigNodes {
 			"60",
 			"",
 			"# The minimum height at which a player must stand to count as an attacker."),
+	WAR_WARZONE(
+			"war.warzone",
+			"",
+			"############################################################",
+			"# +------------------------------------------------------+ #",
+			"# |              Warzone Block Permissions               | #",
+			"# +------------------------------------------------------+ #",
+			"############################################################",
+			""),
+	WAR_WARZONE_EDITABLE_MATERIALS(
+			"war.warzone.editable_materials",
+			"tnt,fence,ladder,wood_door,iron_door,fire",
+			"# List of materaials that can be modified in a warzone.",
+			"# '*' = Allow all materials.",
+			"# Prepend a '-' in front of a material to remove it. Used in conjunction with when you use '*'.",
+			"# Eg: '*,-chest,-furnace'"),
+	WAR_WARZONE_ITEM_USE("war.warzone.item_use", "true"),
+	WAR_WARZONE_SWITCH("war.warzone.switch", "true"),
+	WAR_WARZONE_FIRE(
+			"war.warzone.fire",
+			"true",
+			"# Add '-fire' to editable materials for complete protection when setting is false. This prevents fire to be created and spread."),
+	WAR_WARZONE_EXPLOSIONS("war.warzone.explosions", "true"),
+	WAR_WARZONE_EXPLOSIONS_BREAK_BLOCKS(
+			"war.warzone.explosions_break_blocks",
+			"true"),
+	WAR_WARZONE_EXPLOSIONS_REGEN_BLOCKS(
+			"war.warzone.explosions_regen_blocks",
+			"true",
+			"# TODO: Blocks will not regen as of yet. Stay tuned for later changes.",
+			"# Only under affect when explosions_break_blocks is true."), 
 	WAR_ENEMY(
 			"war.enemy",
 			"",
@@ -1259,38 +1290,7 @@ public enum ConfigNodes {
 	WAR_ENEMY_BEACON_DRAW("war.enemy.beacon.draw", "true"),
 	WAR_ENEMY_BEACON_WIREFRAME_BLOCK(
 			"war.enemy.beacon.wireframe_block",
-			"glowstone"),
-	WAR_WARZONE(
-			"war.warzone",
-			"",
-			"############################################################",
-			"# +------------------------------------------------------+ #",
-			"# |              Warzone Block Permissions               | #",
-			"# +------------------------------------------------------+ #",
-			"############################################################",
-			""),
-	WAR_WARZONE_EDITABLE_MATERIALS(
-			"war.warzone.editable_materials",
-			"tnt,fence,ladder,wood_door,iron_door,fire",
-			"# List of materaials that can be modified in a warzone.",
-			"# '*' = Allow all materials.",
-			"# Prepend a '-' in front of a material to remove it. Used in conjunction with when you use '*'.",
-			"# Eg: '*,-chest,-furnace'"),
-	WAR_WARZONE_ITEM_USE("war.warzone.item_use", "true"),
-	WAR_WARZONE_SWITCH("war.warzone.switch", "true"),
-	WAR_WARZONE_FIRE(
-			"war.warzone.fire",
-			"true",
-			"# Add '-fire' to editable materials for complete protection when setting is false. This prevents fire to be created and spread."),
-	WAR_WARZONE_EXPLOSIONS("war.warzone.explosions", "true"),
-	WAR_WARZONE_EXPLOSIONS_BREAK_BLOCKS(
-			"war.warzone.explosions_break_blocks",
-			"true"),
-	WAR_WARZONE_EXPLOSIONS_REGEN_BLOCKS(
-			"war.warzone.explosions_regen_blocks",
-			"true",
-			"# TODO: Blocks will not regen as of yet. Stay tuned for later changes.",
-			"# Only under affect when explosions_break_blocks is true."), ;
+			"glowstone"), ;
 
 	private final String Root;
 	private final String Default;
