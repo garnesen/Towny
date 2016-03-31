@@ -72,17 +72,6 @@ public class TownyBlockListener implements Listener {
 		PlayerCache cache = plugin.getCache(player);
 
 		/*
-		 * Allow destroy in a WarZone (FlagWar) if it's an editable material.
-		 */
-		if (cache.getStatus() == TownBlockStatus.WARZONE) {
-			if (!TownyWarConfig.isEditableMaterialInWarZone(block.getType())) {
-				event.setCancelled(true);
-				TownyMessaging.sendErrorMsg(player, String.format(TownySettings.getLangString("msg_err_warzone_cannot_edit_material"), "destroy", block.getType().toString().toLowerCase()));
-			}
-			return;
-		}
-
-		/*
 		 * Queue a protectionRegenTask if we have delayed regeneration set
 		 */
 		long delay = TownySettings.getRegenDelay();
