@@ -20,6 +20,7 @@ import com.palmergames.bukkit.towny.object.WorldCoord;
 import com.palmergames.bukkit.towny.object.PlayerCache.TownBlockStatus;
 import com.palmergames.bukkit.towny.object.TownyPermission.ActionType;
 import com.palmergames.bukkit.towny.regen.TownyRegenAPI;
+import com.palmergames.bukkit.towny.war.eventwar.WarzoneBlockConfig;
 import com.palmergames.bukkit.util.BukkitTools;
 
 /**
@@ -354,7 +355,7 @@ public class PlayerCacheUtil {
 	 */
 	private static boolean getPermission(Player player, TownBlockStatus status, WorldCoord pos, Integer blockId, byte data, TownyPermission.ActionType action) {
 
-		if (status == TownBlockStatus.OFF_WORLD || status == TownBlockStatus.WARZONE || status == TownBlockStatus.PLOT_OWNER || status == TownBlockStatus.TOWN_OWNER) // || plugin.isTownyAdmin(player)) // status == TownBlockStatus.ADMIN ||
+		if (status == TownBlockStatus.OFF_WORLD || status == TownBlockStatus.PLOT_OWNER || status == TownBlockStatus.TOWN_OWNER) // || plugin.isTownyAdmin(player)) // status == TownBlockStatus.ADMIN ||
 			return true;
 
 		if (status == TownBlockStatus.NOT_REGISTERED) {
@@ -402,6 +403,11 @@ public class PlayerCacheUtil {
 		// Allow admins to have ALL permissions over towns.
 		if (TownyUniverse.getPermissionSource().isTownyAdmin(player))
 			return true;
+		
+		// Check Warzone Permissions (err msg cached in config class)
+		if (status == TownBlockStatus.WARZONE) {
+			return WarzoneBlockConfig.canDoInWarzone(player, blockId, data, action);
+		}
 
 
 		// Plot Permissions
