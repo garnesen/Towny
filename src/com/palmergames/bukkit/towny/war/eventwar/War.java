@@ -235,6 +235,12 @@ public class War {
 			if (player != null)
 				sendStats(player);
 		
+		// Remove Warzones
+		// TODO: Make more efficient 
+		for (WorldCoord wc : warZone.keySet()) {
+			plugin.getTownyUniverse().removeWarZone(wc);
+		}
+		
 		// Toggle the war huds off for all players (This method is called from an async task so 
 		// we create a sync task to use the scoreboard api)
 		new BukkitRunnable() {
@@ -292,11 +298,13 @@ public class War {
 		TownyMessaging.sendTownMessage(town, TownySettings.getJoinWarMsg(town));
 		townScores.put(town, 0);
 		warringTowns.add(town);
-		for (TownBlock townBlock : town.getTownBlocks())
+		for (TownBlock townBlock : town.getTownBlocks()) {
 			if (town.isHomeBlock(townBlock))
 				warZone.put(townBlock.getWorldCoord(), TownySettings.getWarzoneHomeBlockHealth());
 			else
 				warZone.put(townBlock.getWorldCoord(), TownySettings.getWarzoneTownBlockHealth());
+			plugin.getTownyUniverse().addWarZone(townBlock.getWorldCoord());
+		}
 	}
 
 	/**
@@ -579,6 +587,7 @@ public class War {
 	
 	private void remove(WorldCoord worldCoord) {	
 		warZone.remove(worldCoord);
+		plugin.getTownyUniverse().removeWarZone(worldCoord);
 	}
 	
 	private void sendEliminateMessage(String name) {
