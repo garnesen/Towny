@@ -19,17 +19,15 @@ public class WarzoneBlockConfig {
 	public static boolean canDoInWarzone(Player player, Integer blockId, byte data, TownyPermission.ActionType action) {
 		
 		if (action == ActionType.BUILD && !isEditableMaterialInWarZone(BukkitTools.getMaterial(blockId))) {
-			
+			return false;
 		} else if (action == ActionType.DESTROY && !isEditableMaterialInWarZone(BukkitTools.getMaterial(blockId))) {
 			PlayerCacheUtil.cacheBlockErrMsg(player, String.format(TownySettings.getLangString("msg_err_warzone_cannot_edit_material"), "destroy", BukkitTools.getMaterial(blockId).toString().toLowerCase()));
-		} else if (action == ActionType.ITEM_USE) {
-			
-		} else if (action == ActionType.SWITCH) {
-			
-		} else {
-			// Don't know what action this is, let's return false to be safe.
 			return false;
-		}
+		} else if (action == ActionType.ITEM_USE) {
+			return false;
+		} else if (action == ActionType.SWITCH) {
+			return false;
+		} 
 		
 		return true;
 	}
