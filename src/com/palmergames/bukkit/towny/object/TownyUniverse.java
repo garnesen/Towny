@@ -596,7 +596,14 @@ public class TownyUniverse extends TownyObject {
 		plugin.updateCache(worldCoord);
 	}
 
-	
+	public boolean isWarZone(WorldCoord worldCoord) {
+		
+		try {
+			return worldCoord.getTownyWorld().isWarZone(worldCoord);
+		} catch (NotRegisteredException e) {
+			return false;
+		}
+	}
 
 	public void setChangedNotify(TownyObservableType type) {
 
