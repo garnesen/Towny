@@ -405,6 +405,7 @@ public class PlayerCacheUtil {
 			return true;
 		
 		// Check Warzone Permissions (err msg cached in config class)
+		// OR check if (plugin.getTownyUniverse().isWarZone(pos))
 		if (status == TownBlockStatus.WARZONE) {
 			return WarzoneBlockConfig.canDoInWarzone(player, blockId, data, action);
 		}
