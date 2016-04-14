@@ -1,6 +1,8 @@
 package com.palmergames.bukkit.towny.huds;
 
-import java.util.Hashtable;
+import java.util.ArrayList;
+import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -98,7 +100,7 @@ public class WarHUD {
 		String score;
 		try {
 			Town home = TownyUniverse.getDataSource().getResident(p.getName()).getTown();
-			Hashtable<Town, Integer> scores = war.getTownScores();
+			ConcurrentHashMap<Town, Integer> scores = war.getTownScores();
 			if (scores.containsKey(home))
 				score = scores.get(home) + "";
 			else
@@ -107,19 +109,26 @@ public class WarHUD {
 		p.getScoreboard().getTeam("town_score").setSuffix(HUDManager.check(score));
 	}
 
-	public static void updateTopScores(Player p, String[] top) {
-		String fprefix = top[0].contains("-") ? ChatColor.GOLD + top[0].split("-")[0] + ChatColor.WHITE + "-": "";
-		String sprefix = top[1].contains("-") ? ChatColor.GRAY + top[1].split("-")[0] + ChatColor.WHITE + "-": "";
-		String tprefix = top[2].contains("-") ? ChatColor.GRAY + top[2].split("-")[0] + ChatColor.WHITE + "-": "";
-		String fsuffix = top[0].contains("-") ? top[0].split("-")[1] : "";
-		String ssuffix = top[1].contains("-") ? top[1].split("-")[1] : "";
-		String tsuffix = top[2].contains("-") ? top[2].split("-")[1] : "";
-		p.getScoreboard().getTeam("first").setPrefix(HUDManager.check(fprefix));
-		p.getScoreboard().getTeam("first").setSuffix(HUDManager.check(fsuffix));
-		p.getScoreboard().getTeam("second").setPrefix(HUDManager.check(sprefix));
-		p.getScoreboard().getTeam("second").setSuffix(HUDManager.check(ssuffix));
-		p.getScoreboard().getTeam("third").setPrefix(HUDManager.check(tprefix));
-		p.getScoreboard().getTeam("third").setSuffix(HUDManager.check(tsuffix));
+	public static void updateTopScores(Player p, ArrayList<Entry<Town, Integer>> topThree) {
+		if (topThree.size() >= 1) {
+			String fprefix = ChatColor.GOLD + "" + topThree.get(0).getValue();
+			String fsuffix = ChatColor.WHITE + "-" + topThree.get(0).getKey();
+			p.getScoreboard().getTeam("first").setPrefix(HUDManager.check(fprefix));
+			p.getScoreboard().getTeam("first").setSuffix(HUDManager.check(fsuffix));
+			
+		}
+		if (topThree.size() >= 2) {
+			String sprefix = ChatColor.GRAY + "" + topThree.get(1).getValue();
+			String ssuffix = ChatColor.WHITE + "-" + topThree.get(1).getKey();
+			p.getScoreboard().getTeam("second").setPrefix(HUDManager.check(sprefix));
+			p.getScoreboard().getTeam("second").setSuffix(HUDManager.check(ssuffix));
+		}
+		if (topThree.size() >= 3) {
+			String tprefix = ChatColor.GRAY + "" + topThree.get(2).getValue();
+			String tsuffix = ChatColor.WHITE + "-" + topThree.get(2).getKey();
+			p.getScoreboard().getTeam("third").setPrefix(HUDManager.check(tprefix));
+			p.getScoreboard().getTeam("third").setSuffix(HUDManager.check(tsuffix));
+		}
 	}
 
 	public static void updateScore(Player p, int score) {

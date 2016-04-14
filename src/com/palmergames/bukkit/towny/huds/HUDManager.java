@@ -1,6 +1,7 @@
 package com.palmergames.bukkit.towny.huds;
 
 import java.util.ArrayList;
+import java.util.Map.Entry;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -14,6 +15,7 @@ import com.palmergames.bukkit.towny.event.TownBlockSettingsChangedEvent;
 import com.palmergames.bukkit.towny.exceptions.NotRegisteredException;
 import com.palmergames.bukkit.towny.object.Coord;
 import com.palmergames.bukkit.towny.object.Resident;
+import com.palmergames.bukkit.towny.object.Town;
 import com.palmergames.bukkit.towny.object.WorldCoord;
 import com.palmergames.bukkit.towny.war.eventwar.PlotAttackedEvent;
 import com.palmergames.bukkit.towny.war.eventwar.TownScoredEvent;
@@ -112,9 +114,9 @@ public class HUDManager implements Listener{
 				WarHUD.updateScore(player, event.getScore());
 		}
 		//Update top scores for all HUD users
-		String[] top = warEvent.getTopThree();
+		ArrayList<Entry<Town, Integer>> topThree = warEvent.getTopThree();
 		for (Player p : warUsers)
-			WarHUD.updateTopScores(p, top);
+			WarHUD.updateTopScores(p, topThree);
 	}
 
 	//Perm Specific
