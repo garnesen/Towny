@@ -1,8 +1,12 @@
 package com.palmergames.bukkit.towny.war.eventwar;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
@@ -44,8 +48,8 @@ import com.palmergames.util.TimeTools;
 public class War {
 	
 	// War Data
-	private Hashtable<WorldCoord, Integer> warZone = new Hashtable<WorldCoord, Integer>();
-	private Hashtable<Town, Integer> townScores = new Hashtable<Town, Integer>();
+	private ConcurrentHashMap<WorldCoord, Integer> warZone = new ConcurrentHashMap<WorldCoord, Integer>();
+	private ConcurrentHashMap<Town, Integer> townScores = new ConcurrentHashMap<Town, Integer>();
 	private List<Town> warringTowns = new ArrayList<Town>();
 	private List<Nation> warringNations = new ArrayList<Nation>();
 	private WarSpoils warSpoils = new WarSpoils();
@@ -116,12 +120,12 @@ public class War {
 		return warSpoils;
 	}
 
-	public Hashtable<Town, Integer> getTownScores()
+	public ConcurrentHashMap<Town, Integer> getTownScores()
 	{
 		return townScores;
 	}
 
-	public Hashtable<WorldCoord, Integer> getWarZone()
+	public ConcurrentHashMap<WorldCoord, Integer> getWarZone()
 	{
 		return warZone;
 	}
@@ -144,6 +148,15 @@ public class War {
 	public boolean isWarringTown(Town town) {
 
 		return warringTowns.contains(town);
+	}
+	
+	public boolean isResidentInWar(Resident resident) {
+		
+		try {
+			return resident.hasNation() && isWarringNation(resident.getTown().getNation()) && !resident.getTown().getNation().isNeutral();
+		} catch (NotRegisteredException e) {
+			return false;
+		}
 	}
 	
 	public void toggleEnd() {
@@ -264,9 +277,9 @@ public class War {
 
 			// Pay money to winning town and print message
 			try {
-				KeyValue<Town, Integer> winningTownScore = getWinningTownScore();
-				getWarSpoils().payTo(halfWinnings, winningTownScore.key, "War - Town Winnings");
-				TownyMessaging.sendGlobalMessage(TownySettings.getWarTimeWinningTownSpoilsMsg(winningTownScore.key, TownyEconomyHandler.getFormattedBalance(halfWinnings), winningTownScore.value));
+				Entry<Town, Integer> winningTownScore = getWinningTownScore();
+				getWarSpoils().payTo(halfWinnings, winningTownScore.getKey(), "War - Town Winnings");
+				TownyMessaging.sendGlobalMessage(TownySettings.getWarTimeWinningTownSpoilsMsg(winningTownScore.getKey(), TownyEconomyHandler.getFormattedBalance(halfWinnings), winningTownScore.getValue()));
 			} catch (TownyException e) {
 			}
 		} catch (EconomyException e1) {}
@@ -664,40 +677,71 @@ public class War {
 
 		List<String> output = new ArrayList<String>();
 		output.add(ChatTools.formatTitle("War - Top Scores"));
-		KeyValueTable<Town, Integer> kvTable = new KeyValueTable<Town, Integer>(townScores);
-		kvTable.sortByValue();
-		kvTable.revese();
+		
+		// List of entries
+		ArrayList<Entry<Town, Integer>> entries = new ArrayList<>(townScores.entrySet());
+		
+		// Sorts the list of entries, the entries with the greatest values are at the FRONT
+		Collections.sort(entries, new Comparator<Entry<Town, Integer>>(){
+
+			@Override
+			public int compare(Entry<Town, Integer> e1, Entry<Town, Integer> e2) {
+				if (e1.getValue() > e2.getValue()) { return -1;}
+				else if (e1.getValue() == e2.getValue()) {return 0;}
+				return 1;
+			}
+		});
+		
 		int n = 0;
-		for (KeyValue<Town, Integer> kv : kvTable.getKeyValues()) {
+		for (Entry<Town, Integer> entry : entries) {
 			n++;
 			if (maxListing != -1 && n > maxListing)
 				break;
-			Town town = (Town) kv.key;
-			int score = (Integer) kv.value;
+			Town town = entry.getKey();
+			int score = entry.getValue();
 			if (score > 0)
-				output.add(String.format(Colors.Blue + "%40s " + Colors.Gold + "|" + Colors.LightGray + " %4d", TownyFormatter.getFormattedName(town), score));
+				output.add(String.format(Colors.Blue + "%40s " + Colors.Gold + "|" + Colors.LightGray + " %4d", TownyFormatter.getFormattedName(town), score)); 
 		}
+		
 		return output;
 	}
 
-	public String[] getTopThree() {
-		KeyValueTable<Town, Integer> kvTable = new KeyValueTable<Town, Integer>(townScores);
-		kvTable.sortByValue();
-		kvTable.revese();
-		String[] top = new String[3];
-		top[0] = kvTable.getKeyValues().size() >= 1 ? kvTable.getKeyValues().get(0).value + "-" + kvTable.getKeyValues().get(0).key : "";
-		top[1] = kvTable.getKeyValues().size() >= 2 ? kvTable.getKeyValues().get(1).value + "-" + kvTable.getKeyValues().get(1).key : "";
-		top[2] = kvTable.getKeyValues().size() >= 3 ? kvTable.getKeyValues().get(2).value + "-" + kvTable.getKeyValues().get(2).key : "";
-		return top;
+	/**
+	 * Create an array with at most the top three towns (could be top two if only two in war)
+	 * @return list with the top three entries
+	 */
+	public ArrayList<Entry<Town, Integer>> getTopThree() {
+		ArrayList<Entry<Town, Integer>> topThree = new ArrayList<>(3);
+		for (Entry<Town, Integer> entry : townScores.entrySet()) {
+			int insertPos = -1;
+			if (topThree.size() == 0 || entry.getValue() > topThree.get(0).getValue()) {
+				insertPos = 0;
+			} else if (topThree.size() == 1 || entry.getValue() > topThree.get(1).getValue()) {
+				insertPos = 1;
+			} else if (topThree.size() == 2 || entry.getValue() > topThree.get(2).getValue()) {
+				insertPos = 2;
+			}
+			if (insertPos != -1) {
+				if (topThree.size() == 3) {
+					topThree.remove(2);
+				}
+				topThree.add(insertPos, entry);
+			}
+		}
+		return topThree;
 	}
 
-	public KeyValue<Town, Integer> getWinningTownScore() throws TownyException {
+	public Entry<Town, Integer> getWinningTownScore() throws TownyException {
 
-		KeyValueTable<Town, Integer> kvTable = new KeyValueTable<Town, Integer>(townScores);
-		kvTable.sortByValue();
-		kvTable.revese();
-		if (kvTable.getKeyValues().size() > 0)
-			return kvTable.getKeyValues().get(0);
+		if (townScores.size() > 0) {
+			int topScore = Collections.max(townScores.values());
+			for (Entry<Town, Integer> kv : townScores.entrySet()) {
+				if (kv.getValue() == topScore) {
+					return kv;
+				}
+			}
+			throw new TownyException();
+		}
 		else
 			throw new TownyException();
 	}
