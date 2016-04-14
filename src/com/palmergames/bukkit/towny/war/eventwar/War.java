@@ -6,7 +6,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
@@ -39,8 +38,6 @@ import com.palmergames.bukkit.util.BukkitTools;
 import com.palmergames.bukkit.util.ChatTools;
 import com.palmergames.bukkit.util.Colors;
 import com.palmergames.bukkit.util.ServerBroadCastTimerTask;
-import com.palmergames.util.KeyValue;
-import com.palmergames.util.KeyValueTable;
 import com.palmergames.util.TimeMgmt;
 import com.palmergames.util.TimeTools;
 
