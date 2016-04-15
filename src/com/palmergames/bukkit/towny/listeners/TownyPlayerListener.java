@@ -54,6 +54,7 @@ import com.palmergames.bukkit.towny.permissions.TownyPerms;
 import com.palmergames.bukkit.towny.regen.TownyRegenAPI;
 import com.palmergames.bukkit.towny.regen.block.BlockLocation;
 import com.palmergames.bukkit.towny.utils.PlayerCacheUtil;
+import com.palmergames.bukkit.towny.war.eventwar.War;
 import com.palmergames.bukkit.towny.war.flagwar.TownyWarConfig;
 import com.palmergames.bukkit.util.BukkitTools;
 import com.palmergames.bukkit.util.ChatTools;
@@ -804,8 +805,8 @@ public class TownyPlayerListener implements Listener {
 		
 		Player player = event.getPlayer();
 		try {
-			if (TownyUniverse.getDataSource().getResident(player.getName()).isJailed()) {
-				Resident resident = TownyUniverse.getDataSource().getResident(player.getName());
+			Resident resident = TownyUniverse.getDataSource().getResident(player.getName());
+			if (resident.isJailed()) {
 				WorldCoord from = event.getFrom();
 				WorldCoord to = event.getTo();
 				//TownyMessaging.sendMsg(from.toString() + to.toString());
@@ -822,6 +823,11 @@ public class TownyPlayerListener implements Listener {
 						
 					}
 				}
+			}
+			
+			War war = plugin.getTownyUniverse().getWarEvent();
+			if (war.isWarTime() && war.isResidentInWar(resident)) {
+				// TODO: Update WarZoneData in WarTimerTask
 			}
 		} catch (NotRegisteredException e) {
 			// If not registered, it is most likely an NPC			
