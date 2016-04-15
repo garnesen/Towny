@@ -683,8 +683,8 @@ public class War {
 
 			@Override
 			public int compare(Entry<Town, Integer> e1, Entry<Town, Integer> e2) {
-				if (e1.getValue() > e2.getValue()) { return -1;}
-				else if (e1.getValue() == e2.getValue()) {return 0;}
+				if (e1.getValue() > e2.getValue()) { return -1; }
+				else if (e1.getValue() == e2.getValue()) { return 0; }
 				return 1;
 			}
 		});
@@ -737,10 +737,8 @@ public class War {
 					return kv;
 				}
 			}
-			throw new TownyException();
-		}
-		else
-			throw new TownyException();
+		}			
+		throw new TownyException();
 	}
 	
 	public void sendScores(Player player) {
