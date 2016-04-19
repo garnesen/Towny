@@ -826,8 +826,8 @@ public class TownyPlayerListener implements Listener {
 			}
 			
 			War war = plugin.getTownyUniverse().getWarEvent();
-			if (war.isWarTime() && war.isResidentInWar(resident)) {
-				// TODO: Update WarZoneData in WarTimerTask
+			if (TownyUniverse.isWarTime() && war.isResidentInWar(resident)) {
+				war.updateWarzoneDataCache(player, event.getFrom(), event.getTo());
 			}
 		} catch (NotRegisteredException e) {
 			// If not registered, it is most likely an NPC			

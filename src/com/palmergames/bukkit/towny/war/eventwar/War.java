@@ -55,6 +55,7 @@ public class War {
 	private TownyUniverse universe;
 	private boolean warTime = false;
 	private List<Integer> warTaskIds = new ArrayList<Integer>();
+	private WarTimerTask warTimerTask;
 
 	/**
 	 * Creates a new War instance.
@@ -132,6 +133,11 @@ public class War {
 		return warringTowns;
 	}
 	
+	public List<Nation> getWarringNations() {
+		
+		return warringNations;
+	}
+	
 	public boolean isWarZone(WorldCoord worldCoord) {
 
 		return warZone.containsKey(worldCoord);
@@ -159,6 +165,13 @@ public class War {
 	public void toggleEnd() {
 
 		warTime = false;
+	}
+	
+	public void updateWarzoneDataCache(Player p, WorldCoord to, WorldCoord from) {
+		
+		if (warTimerTask != null) {
+			warTimerTask.updateWarzoneDataCache(p, to, from);
+		}
 	}
 
 	//// END GETTERS/SETTERS ////
@@ -225,7 +238,8 @@ public class War {
 		}
 
 		// Start the WarTimerTask
-		int id = BukkitTools.scheduleAsyncRepeatingTask(new WarTimerTask(plugin, this), 0, TimeTools.convertToTicks(5));
+		warTimerTask = new WarTimerTask(plugin, this);
+		int id = BukkitTools.scheduleAsyncRepeatingTask(warTimerTask, 0, TimeTools.convertToTicks(5));
 		if (id == -1) {
 			TownyMessaging.sendErrorMsg("Could not schedule war event loop.");
 			end();
@@ -368,7 +382,7 @@ public class War {
 	 * @param wzd
 	 * @throws NotRegisteredException
 	 */
-	public void updateWarZone (TownBlock townBlock, WarZoneData wzd) throws NotRegisteredException {
+	public void updateWarzone (TownBlock townBlock, WarZoneData wzd) throws NotRegisteredException {
 		if (!wzd.hasAttackers()) 
 			healPlot(townBlock, wzd);
 		else
