@@ -39,6 +39,7 @@ import com.palmergames.bukkit.towny.questioner.AllyQuestionTask;
 import com.palmergames.bukkit.towny.questioner.JoinNationTask;
 import com.palmergames.bukkit.towny.questioner.NationAllyTask;
 import com.palmergames.bukkit.towny.questioner.ResidentNationQuestionTask;
+import com.palmergames.bukkit.towny.war.eventwar.War;
 import com.palmergames.bukkit.util.BukkitTools;
 import com.palmergames.bukkit.util.ChatTools;
 import com.palmergames.bukkit.util.Colors;
@@ -1269,6 +1270,14 @@ public class NationCommand extends BaseCommand implements CommandExecutor {
 
 					TownyMessaging.sendNationMessage(nation, TownySettings.getLangString("msg_nation_peaceful") + (nation.isNeutral
 							() ? Colors.Green : Colors.Red + " not") + " peaceful.");
+					
+					// Check if the nation has changed to neutral and was in war
+					if (nation.isNeutral()) {
+						War war = plugin.getTownyUniverse().getWarEvent();
+						if (TownyUniverse.isWarTime() && war.isWarringNation(nation)) {
+							war.nationLeave(nation);
+						}
+					}
 				} catch (EconomyException e) {
 					TownyMessaging.sendErrorMsg(player, e.getMessage());
 				} catch (TownyException e) {
