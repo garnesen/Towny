@@ -47,8 +47,8 @@ public class War {
 	// War Data
 	private ConcurrentHashMap<WorldCoord, Integer> warZone = new ConcurrentHashMap<WorldCoord, Integer>();
 	private ConcurrentHashMap<Town, Integer> townScores = new ConcurrentHashMap<Town, Integer>();
-	private List<Town> warringTowns = new ArrayList<Town>();
-	private List<Nation> warringNations = new ArrayList<Nation>();
+	private List<Town> warringTowns = Collections.synchronizedList(new ArrayList<Town>());
+	private List<Nation> warringNations = Collections.synchronizedList(new ArrayList<Nation>());
 	private WarSpoils warSpoils = new WarSpoils();
 	
 	private Towny plugin;
@@ -399,7 +399,7 @@ public class War {
 		WorldCoord worldCoord = townBlock.getWorldCoord();
 		int healthChange = wzd.getHealthChange();
 		int oldHP = warZone.get(worldCoord);
-		int hp = getHealth(townBlock, healthChange);
+		int hp = getHealth(townBlock, oldHP, healthChange);
 		if (oldHP == hp)
 			return;
 		warZone.put(worldCoord, hp);
@@ -424,14 +424,15 @@ public class War {
 	 */
 	private void attackPlot(TownBlock townBlock, WarZoneData wzd) throws NotRegisteredException {
 
-		Player attackerPlayer = wzd.getRandomAttacker();
+		Player attackerPlayer = wzd.getLongestStandingAttacker();
 		Resident attackerResident = TownyUniverse.getDataSource().getResident(attackerPlayer.getName());
 		Town attacker = attackerResident.getTown();
 
 		//Health, messaging, fireworks..
 		WorldCoord worldCoord = townBlock.getWorldCoord();
 		int healthChange = wzd.getHealthChange();
-		int hp = getHealth(townBlock, healthChange);
+		int oldHP = warZone.get(worldCoord);
+		int hp = getHealth(townBlock, oldHP, healthChange);
 		Color fwc = healthChange < 0 ? Color.RED : (healthChange > 0 ? Color.LIME : Color.GRAY);
 		if (hp > 0) {
 			warZone.put(worldCoord, hp);
@@ -475,9 +476,8 @@ public class War {
 	 * @param healthChange
 	 * @return
 	 */
-	private int getHealth(TownBlock townBlock, int healthChange) {
-		WorldCoord worldCoord = townBlock.getWorldCoord();
-		int hp = warZone.get(worldCoord) + healthChange;
+	private int getHealth(TownBlock townBlock, int oldHP, int healthChange) {
+		int hp = oldHP + healthChange;
 		boolean isHomeBlock = townBlock.isHomeBlock();
 		if (isHomeBlock && hp > TownySettings.getWarzoneHomeBlockHealth())
 			return TownySettings.getWarzoneHomeBlockHealth();
