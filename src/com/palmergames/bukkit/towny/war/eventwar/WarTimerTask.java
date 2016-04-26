@@ -2,6 +2,8 @@ package com.palmergames.bukkit.towny.war.eventwar;
 
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -22,12 +24,14 @@ public class WarTimerTask extends TownyTimerTask {
 
 	War warEvent;
 	ConcurrentHashMap<TownBlock, WarZoneData> warzoneDataCache;
+	Lock lock;
 
 	public WarTimerTask(Towny plugin, War warEvent) {
 
 		super(plugin);
 		this.warEvent = warEvent;
 		warzoneDataCache = new ConcurrentHashMap<TownBlock, WarZoneData>();
+		lock = new ReentrantLock();
 		initializeCache();
 	}
 	
@@ -51,20 +55,29 @@ public class WarTimerTask extends TownyTimerTask {
 			return;
 		}
 			
-		// Send warzone updates
-		for (Entry<TownBlock, WarZoneData> entry : warzoneDataCache.entrySet()) {
-			try {
-				warEvent.updateWarzone(entry.getKey(), entry.getValue());
-			} catch (NotRegisteredException e) {
-				TownyMessaging.sendDebugMsg("[War]   WarZone Update Failed");
+		lock.lock();
+		try {
+			
+			// Send warzone updates
+			for (Entry<TownBlock, WarZoneData> entry : warzoneDataCache.entrySet()) {
+				try {
+					warEvent.updateWarzone(entry.getKey(), entry.getValue());
+				} catch (NotRegisteredException e) {
+					TownyMessaging.sendDebugMsg("[War]   WarZone Update Failed");
+				}
 			}
+			
+		} finally {
+			lock.unlock();
 		}
+		
 
 	}
 	
 	public void updateWarzoneDataCache(Player p, WorldCoord to, WorldCoord from) {
 		
 		// Already checked if this player is in war
+		lock.unlock();
 		try {
 			TownyMessaging.sendDebugMsg("[War]   " + p.getName() + ": ");
 			
@@ -119,7 +132,10 @@ public class WarTimerTask extends TownyTimerTask {
 			TownyMessaging.sendDebugMsg("[War]   damaged");
 			
 			
-		} catch (NotRegisteredException e) {}
+		} catch (NotRegisteredException e) {
+		} finally {
+			lock.unlock();
+		}
 	}
 	
 	private void initializeCache() {
